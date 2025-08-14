@@ -3,11 +3,13 @@ venv/
 env/
 .env
 .venv
+.claude
 
 # Dados do n8n (contém banco de dados e configurações sensíveis)
 n8n_data/
 *.sqlite
 *.db
+N8N-DevHub/
 
 # Workflows locais devem subir pro git - COMENTADO para permitir versionamento
 # workflows/ - MANTEMOS workflows/ no git para versionamento do código!

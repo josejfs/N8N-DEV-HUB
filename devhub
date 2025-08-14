@@ -1,0 +1,26 @@
+#!/bin/bash
+# N8N-DevHub - Script Principal
+
+SCRIPT_DIR="$(dirname "$0")"
+DEVHUB_DIR="$SCRIPT_DIR/N8N-DevHub"
+
+# Comandos especiais
+case "$1" in
+    "init")
+        echo "🚀 Inicializando N8N-DevHub..."
+        exec "$DEVHUB_DIR/scripts/init-dev"
+        ;;
+    "docker")
+        shift
+        exec "$DEVHUB_DIR/scripts/dev-control" "$@"
+        ;;
+    *)
+        # Detectar se precisa ativar venv
+        if [ -d "$SCRIPT_DIR/venv" ] && [ -z "$VIRTUAL_ENV" ]; then
+            source "$SCRIPT_DIR/venv/bin/activate"
+        fi
+        
+        # Executar DevHub Python
+        exec python3 "$DEVHUB_DIR/python/devhub.py" "$@"
+        ;;
+esac
