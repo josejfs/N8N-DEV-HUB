@@ -208,7 +208,6 @@ class CLIView:
         setup_commands = [
             (self._colorize('init', Colors.GREEN), "Inicializar ambiente completo"),
             (f"{self._colorize('docker', Colors.GREEN)} <cmd>", "Controle Docker (start/stop/logs)"),
-            (self._colorize('install-global', Colors.GREEN), "Instalar comando 'devhub' globalmente")
         ]
         self._print_section("🛠️  SETUP E AMBIENTE", setup_commands)
         

@@ -14,10 +14,6 @@ case "$1" in
         shift
         exec "$DEVHUB_DIR/scripts/dev-control" "$@"
         ;;
-    "install-global")
-        echo "🔧 Instalando devhub globalmente..."
-        exec "$DEVHUB_DIR/scripts/install-global"
-        ;;
     *)
         # Detectar se precisa ativar venv
         if [ -d "$SCRIPT_DIR/venv" ] && [ -z "$VIRTUAL_ENV" ]; then
