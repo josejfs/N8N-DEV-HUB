@@ -1,0 +1,62 @@
+#!/bin/bash
+# N8N-DevHub - Controle do Ambiente de Desenvolvimento
+
+case "$1" in
+    "start"|"up")
+        echo "🚀 Iniciando ambiente de desenvolvimento..."
+        "$(dirname "$0")/init-dev"
+        ;;
+    "stop"|"down")
+        echo "🛑 Parando ambiente de desenvolvimento..."
+        cd "$(dirname "$0")/../.."
+        docker-compose -f N8N-DevHub/docker-compose.yml down
+        echo "✅ Ambiente parado"
+        ;;
+    "restart")
+        echo "🔄 Reiniciando ambiente..."
+        cd "$(dirname "$0")/../.."
+        docker-compose -f N8N-DevHub/docker-compose.yml down
+        docker-compose -f N8N-DevHub/docker-compose.yml up -d
+        echo "✅ Ambiente reiniciado"
+        ;;
+    "logs")
+        echo "📋 Logs do n8n:"
+        cd "$(dirname "$0")/../.."
+        docker-compose -f N8N-DevHub/docker-compose.yml logs -f
+        ;;
+    "status")
+        echo "📊 Status dos containers:"
+        cd "$(dirname "$0")/../.."
+        docker-compose -f N8N-DevHub/docker-compose.yml ps
+        ;;
+    "clean")
+        echo "🧹 Limpando dados (cuidado: remove tudo!)..."
+        read -p "Tem certeza? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            cd "$(dirname "$0")/../.."
+            docker-compose -f N8N-DevHub/docker-compose.yml down -v
+            echo "✅ Dados limpos"
+        else
+            echo "❌ Operação cancelada"
+        fi
+        ;;
+    *)
+        echo "N8N-DevHub - Controle do Ambiente de Desenvolvimento"
+        echo ""
+        echo "Uso: $0 [COMANDO]"
+        echo ""
+        echo "Comandos:"
+        echo "  start, up      Inicia ambiente completo"
+        echo "  stop, down     Para ambiente"
+        echo "  restart        Reinicia ambiente"
+        echo "  logs           Mostra logs em tempo real"
+        echo "  status         Status dos containers"
+        echo "  clean          Remove todos os dados (cuidado!)"
+        echo ""
+        echo "Exemplos:"
+        echo "  $0 start       # Inicializa tudo"
+        echo "  $0 logs        # Ver logs do n8n"
+        echo "  $0 stop        # Parar tudo"
+        ;;
+esac

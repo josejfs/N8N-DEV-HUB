@@ -31,10 +31,22 @@ O N8N-DevHub é um sistema completo que transforma o gerenciamento de workflows 
 - ✅ Sobe ambiente N8N Docker
 - ✅ Testa conectividade
 
-### **2. Comandos Básicos**
+### **2. Instalação Global (Opcional)**
+Para usar `devhub` sem `./` de qualquer diretório:
+```bash
+# Instalar globalmente
+./devhub install-global
+
+# Agora use de qualquer lugar:
+devhub list
+devhub download "Demo RAG"
+devhub sync-start "Demo RAG"
+```
+
+### **3. Comandos Básicos**
 ```bash
 # Listar workflows
-./devhub list
+./devhub list          # ou apenas: devhub list
 
 # Baixar workflow específico
 ./devhub download "Demo RAG"
@@ -344,6 +356,68 @@ A CLI usa cores para melhor experiência:
 - 🔴 **Vermelho**: Erros
 - 🔵 **Azul**: Informações
 - 🟦 **Ciano**: URLs, IDs
+
+## 🌍 Instalação Global
+
+### **Automática (Recomendada)**
+```bash
+# Instalar globalmente com um comando
+./devhub install-global
+```
+
+O script automático:
+- ✅ Cria `~/.local/bin/devhub` com caminhos absolutos
+- ✅ Adiciona `~/.local/bin` ao PATH em `~/.bashrc`
+- ✅ Configura PATH para sessão atual
+- ✅ Testa instalação e conectividade
+- ✅ Funciona de qualquer diretório do sistema
+
+### **Manual** (se necessário)
+```bash
+# 1. Copiar script
+cp devhub ~/.local/bin/devhub
+chmod +x ~/.local/bin/devhub
+
+# 2. Editar caminhos no script
+nano ~/.local/bin/devhub
+# Alterar PROJECT_DIR para caminho absoluto
+
+# 3. Adicionar ao PATH
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### **Verificação**
+```bash
+# Testar se funciona
+which devhub                    # Deve mostrar ~/.local/bin/devhub
+devhub help                     # Interface deve aparecer
+devhub list                     # Deve listar workflows
+
+# Se não funcionar em novo terminal:
+source ~/.bashrc
+```
+
+### **Uso Global**
+Após instalação, use de qualquer diretório:
+```bash
+cd ~
+devhub list                     # Funciona!
+
+cd /tmp  
+devhub sync-start "Demo"        # Funciona!
+
+cd /var/www
+devhub download "API"           # Funciona!
+```
+
+### **Reinstalação**
+Se mover o projeto ou ter problemas:
+```bash
+# Reinstalar automaticamente
+devhub install-global           # ou
+./path/to/projeto/devhub install-global
+```
 
 ## 🔧 Configurações Avançadas
 

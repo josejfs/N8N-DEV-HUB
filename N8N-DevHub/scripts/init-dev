@@ -1,0 +1,124 @@
+#!/bin/bash
+# N8N-DevHub - Inicializador do Ambiente de Desenvolvimento
+
+set -e
+
+# Ir para diretório raiz do projeto (2 níveis acima)
+cd "$(dirname "$0")/../.."
+
+echo "🚀 Inicializando Ambiente de Desenvolvimento N8N-DevHub..."
+echo
+
+# Verificar se Python está disponível
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python3 não encontrado. Instale Python 3.8+ primeiro."
+    exit 1
+fi
+
+# Verificar se Docker está rodando
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Docker não está rodando. Inicie o Docker primeiro."
+    exit 1
+fi
+
+# Criar ambiente virtual Python se não existir
+if [ ! -d "venv" ]; then
+    echo "🐍 Criando ambiente virtual Python..."
+    python3 -m venv venv
+    echo "✅ Ambiente virtual criado"
+else
+    echo "✅ Ambiente virtual já existe"
+fi
+
+# Ativar ambiente virtual
+echo "📦 Ativando ambiente virtual..."
+source venv/bin/activate
+
+# Instalar/atualizar dependências
+echo "📚 Instalando dependências Python..."
+pip install --upgrade pip > /dev/null 2>&1
+pip install -r N8N-DevHub/requirements.txt
+
+echo "✅ Dependências Python instaladas"
+echo
+
+# Criar pasta workflows se não existir
+if [ ! -d "workflows" ]; then
+    echo "📁 Criando pasta workflows..."
+    mkdir -p workflows
+    echo "✅ Pasta workflows criada"
+else
+    echo "✅ Pasta workflows já existe"
+fi
+echo
+
+# Ir para diretório N8N-DevHub para executar docker-compose
+cd "N8N-DevHub"
+
+# Verificar se docker-compose existe
+if [ ! -f "docker-compose.yml" ]; then
+    echo "❌ docker-compose.yml não encontrado em N8N-DevHub/"
+    exit 1
+fi
+
+echo "📋 Configurações do ambiente:"
+echo "   • N8N: http://localhost:5678"
+echo "   • User: admin"
+echo "   • Pass: admin123"
+echo "   • Timezone: America/Sao_Paulo"
+echo "   • Database: SQLite (volume nomeado)"
+echo "   • Workflows: ../workflows"
+echo
+
+# Iniciar containers
+echo "🐳 Iniciando containers Docker..."
+docker-compose up -d
+
+# Aguardar n8n ficar disponível
+echo "⏳ Aguardando n8n ficar disponível..."
+timeout=60
+counter=0
+
+while ! curl -s http://localhost:5678 > /dev/null; do
+    if [ $counter -ge $timeout ]; then
+        echo "❌ Timeout: N8N não respondeu em ${timeout}s"
+        exit 1
+    fi
+    
+    echo -n "."
+    sleep 1
+    counter=$((counter + 1))
+done
+
+echo
+echo "✅ N8N está rodando!"
+echo
+echo "🌐 Acesse: http://localhost:5678"
+echo "👤 Login: admin / admin123"
+echo
+echo "📋 Comandos úteis:"
+echo "   ./devhub list                    # Listar workflows"
+echo "   ./devhub sync-start 'workflow'   # Iniciar sincronização"
+echo "   docker-compose -f N8N-DevHub/docker-compose.yml logs -f  # Ver logs"
+echo "   docker-compose -f N8N-DevHub/docker-compose.yml down     # Parar"
+echo
+
+# Voltar para diretório raiz
+cd ..
+
+# Testar conexão com DevHub (com venv ativo)
+echo "🔍 Testando conexão DevHub..."
+if python3 N8N-DevHub/python/devhub.py list > /dev/null 2>&1; then
+    echo "✅ DevHub conectado com sucesso!"
+else
+    echo "⚠️  DevHub com problema de conexão (normal na primeira vez)"
+fi
+
+echo
+echo "🎉 Ambiente de desenvolvimento inicializado!"
+echo ""
+echo "📋 Para usar o DevHub:"
+echo "   source venv/bin/activate  # Ativar ambiente virtual"
+echo "   ./devhub list             # Ou usar diretamente"
+echo ""
+echo "🚀 Comece desenvolvendo seus workflows!"
