@@ -121,12 +121,42 @@ class WorkflowModel:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Erro de conexão ao buscar workflow {workflow_id}: {e}")
     
+    def _clean_workflow_data(self, workflow_data: Dict) -> Dict:
+        """Limpa dados do workflow removendo propriedades que causam problemas no upload"""
+        import copy
+        
+        # Criar cópia profunda para não modificar o original
+        clean_data = copy.deepcopy(workflow_data)
+        
+        # Remover campos do workflow principal (read-only ou gerados automaticamente)
+        fields_to_remove = [
+            'id', 'createdAt', 'updatedAt', 'shared', 'versionId', 'meta', 
+            'active', 'tags', 'pinData', 'triggerCount', 'isArchived'
+        ]
+        for field in fields_to_remove:
+            clean_data.pop(field, None)
+        
+        # Limpar nós individuais
+        if 'nodes' in clean_data and isinstance(clean_data['nodes'], list):
+            for node in clean_data['nodes']:
+                if isinstance(node, dict):
+                    # Remover id e webhookId dos nós
+                    node.pop('id', None)
+                    node.pop('webhookId', None)
+                    
+                    # Remover IDs de credenciais (serão reassociadas por nome)
+                    if 'credentials' in node and isinstance(node['credentials'], dict):
+                        for cred_type, cred_data in node['credentials'].items():
+                            if isinstance(cred_data, dict):
+                                cred_data.pop('id', None)
+        
+        return clean_data
+
     def create_workflow(self, workflow_data: Dict) -> Optional[Dict]:
         """Cria um novo workflow"""
         try:
-            # Remover campos que não devem ser enviados na criação
-            clean_data = {k: v for k, v in workflow_data.items() 
-                         if k not in ['id', 'createdAt', 'updatedAt', 'shared', 'versionId']}
+            # Limpar dados do workflow
+            clean_data = self._clean_workflow_data(workflow_data)
             
             response = self._make_request('POST', 'workflows', json=clean_data)
             
@@ -142,9 +172,8 @@ class WorkflowModel:
     def update_workflow(self, workflow_id: str, workflow_data: Dict) -> Optional[Dict]:
         """Atualiza um workflow existente"""
         try:
-            # Remover campos que não devem ser enviados na atualização
-            clean_data = {k: v for k, v in workflow_data.items() 
-                         if k not in ['id', 'createdAt', 'updatedAt', 'shared', 'versionId']}
+            # Limpar dados do workflow
+            clean_data = self._clean_workflow_data(workflow_data)
             
             response = self._make_request('PUT', f'workflows/{workflow_id}', json=clean_data)
             

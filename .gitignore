@@ -4,6 +4,8 @@ env/
 .env
 .venv
 .claude
+workflows/RAG_QJ0yQ3i0omtHQXZr.json
+workflows/RAG_thdqt2Ib8BsaX8EN.json
 
 # Dados do n8n (contém banco de dados e configurações sensíveis)
 n8n_data/

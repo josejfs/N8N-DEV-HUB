@@ -181,6 +181,9 @@ class WorkflowController:
                 # Atualizar workflow existente
                 result = self.model.update_workflow(workflow_id, workflow_data)
                 if result:
+                    # Após sucesso: substituir arquivo local pela versão padrão DevHub
+                    if by_filename:
+                        self._refresh_local_workflow_after_upload(result, identifier)
                     return True, f"Workflow '{workflow_name}' atualizado com sucesso"
                 else:
                     return False, f"Erro ao atualizar workflow '{workflow_name}'"
@@ -188,12 +191,59 @@ class WorkflowController:
                 # Criar novo workflow
                 result = self.model.create_workflow(workflow_data)
                 if result:
+                    # Após sucesso: substituir arquivo local pela versão padrão DevHub
+                    if by_filename:
+                        self._refresh_local_workflow_after_upload(result, identifier)
                     return True, f"Workflow '{workflow_name}' criado com sucesso"
                 else:
                     return False, f"Erro ao criar workflow '{workflow_name}'"
                     
         except Exception as e:
             return False, f"Erro ao enviar workflow: {e}"
+    
+    def _refresh_local_workflow_after_upload(self, uploaded_workflow: Dict, original_filename: str):
+        """
+        Substitui o arquivo local pela versão padrão DevHub após upload bem-sucedido
+        """
+        try:
+            import os
+            
+            # Obter informações do workflow uploadado
+            workflow_id = uploaded_workflow.get('id')
+            workflow_name = uploaded_workflow.get('name', 'Unknown')
+            
+            if not workflow_id:
+                return
+            
+            # Baixar versão atualizada do servidor
+            fresh_workflow = self.model.get_workflow_by_id(workflow_id)
+            if not fresh_workflow:
+                return
+            
+            # Gerar nome do arquivo no padrão DevHub
+            safe_name = re.sub(r'[^\w\s-]', '', workflow_name).strip()
+            safe_name = re.sub(r'[-\s]+', '_', safe_name)
+            devhub_filename = f"{safe_name}_{workflow_id}.json"
+            
+            # Caminhos
+            workflows_dir = self.model.workflows_dir
+            original_path = os.path.join(workflows_dir, original_filename)
+            devhub_path = os.path.join(workflows_dir, devhub_filename)
+            
+            # Salvar no padrão DevHub
+            filepath = self.model.save_workflow_to_file(fresh_workflow, devhub_filename)
+            
+            if filepath:
+                # Se o arquivo original for diferente do padrão DevHub, removê-lo
+                if original_path != devhub_path and os.path.exists(original_path):
+                    try:
+                        os.remove(original_path)
+                    except OSError:
+                        pass  # Ignorar erro de remoção
+                        
+        except Exception:
+            # Ignorar erros no refresh - o upload já foi bem-sucedido
+            pass
     
     def upload_all_workflows(self) -> Tuple[int, int, List[str]]:
         """
@@ -210,6 +260,7 @@ class WorkflowController:
                     workflow_data = wf['data']
                     workflow_id = workflow_data.get('id')
                     workflow_name = workflow_data.get('name', 'Unknown')
+                    original_filename = wf.get('filename', '')
                     
                     # Verificar se existe remotamente
                     existing = None
@@ -227,6 +278,8 @@ class WorkflowController:
                     
                     if result:
                         success_count += 1
+                        # Após sucesso: substituir arquivo local pela versão padrão DevHub
+                        self._refresh_local_workflow_after_upload(result, original_filename)
                     else:
                         error_messages.append(f"Erro ao processar '{workflow_name}'")
                         
@@ -294,7 +347,10 @@ class WorkflowController:
             workflow_id = identifier
             workflow_name = identifier
             
-            if not by_id:
+            # Auto-detectar se é um ID (16 caracteres alfanuméricos)
+            is_likely_id = len(identifier) == 16 and identifier.isalnum()
+            
+            if not by_id and not is_likely_id:
                 # Buscar por nome
                 matches = self.find_workflow_by_name(identifier)
                 if len(matches) == 0:
@@ -305,6 +361,13 @@ class WorkflowController:
                 
                 workflow_id = matches[0].id
                 workflow_name = matches[0].name
+            elif is_likely_id or by_id:
+                # Tentar buscar por ID para obter o nome
+                workflow_info = self.find_workflow_by_id(identifier)
+                if workflow_info:
+                    workflow_name = workflow_info.name
+                else:
+                    workflow_name = identifier  # Fallback para o ID
             
             success = self.model.delete_workflow(workflow_id)
             if success:
