@@ -6,6 +6,13 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat-square&logo=python)](https://python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker)](https://docker.com/)
 
+---
+
+**Desenvolvido por: [José Ferreira](https://github.com/jose-ferreira)** 👨‍💻
+*Especialista em Automação e Sistemas N8N*
+
+---
+
 ## 🎯 O que é o N8N-DevHub?
 
 O N8N-DevHub é um sistema completo que transforma o gerenciamento de workflows N8N em uma experiência profissional e eficiente, oferecendo:
@@ -17,36 +24,43 @@ O N8N-DevHub é um sistema completo que transforma o gerenciamento de workflows 
 - ⚡ **Interface CLI** moderna com cores e ícones
 - 🐳 **Docker Ready** para desenvolvimento
 
-## ⚡ Início Rápido
+## ⚡ Configuração Inicial
 
-### **1. Inicializar Ambiente Completo**
+### **1. Instalar Dependências Python**
+
 ```bash
-# Configura Python venv + N8N Docker + dependências
+# 1. Criar ambiente virtual
+python3 -m venv venv
+
+# 2. Ativar ambiente virtual  
+source venv/bin/activate
+
+# 3. Instalar dependências
+pip install -r N8N-DevHub/requirements.txt
+```
+
+### **2. Inicializar Ambiente Docker**
+
+```bash
+# Sobe ambiente N8N Docker + cria pasta workflows
 ./devhub init
 ```
-*O comando `init` faz tudo automaticamente:*
-- ✅ Cria ambiente virtual Python (`venv/` na raiz)
-- ✅ Instala dependências (`requirements.txt`)
+
+*O comando `init` agora apenas:*
+
+- ✅ Verifica se venv e dependências estão OK
 - ✅ Cria pasta `workflows/` se não existir
 - ✅ Sobe ambiente N8N Docker
 - ✅ Testa conectividade
 
-### **2. Instalação Global (Opcional)**
-Para usar `devhub` sem `./` de qualquer diretório:
-```bash
-# Instalar globalmente
-./devhub install-global
-
-# Agora use de qualquer lugar:
-devhub list
-devhub download "Demo RAG"
-devhub sync-start "Demo RAG"
-```
-
 ### **3. Comandos Básicos**
+
 ```bash
+# Sempre ativar ambiente antes de usar
+source venv/bin/activate
+
 # Listar workflows
-./devhub list          # ou apenas: devhub list
+./devhub list
 
 # Baixar workflow específico
 ./devhub download "Demo RAG"
@@ -55,13 +69,17 @@ devhub sync-start "Demo RAG"
 ./devhub sync-start "Demo RAG"
 ```
 
-### **3. Acessar N8N**
+**⚠️ Importante**: Use sempre `./devhub` (com `./`) para executar os comandos.
+
+### **4. Acessar N8N**
+
 - 🌐 **URL**: http://localhost:5678
 - 👤 **Login**: admin / admin123
 
 ## 📋 Funcionalidades Principais
 
 ### 🔄 **Sincronização Assíncrona**
+
 Sistema que monitora mudanças em tempo real nos dois sentidos:
 
 ```bash
@@ -75,6 +93,7 @@ Sistema que monitora mudanças em tempo real nos dois sentidos:
 ```
 
 **Como funciona:**
+
 - 📁 **File Watcher**: Detecta mudanças em `.json` instantaneamente
 - 📡 **Remote Polling**: Verifica N8N a cada X segundos
 - 🚨 **Conflict Resolution**: 4 estratégias (ask/local/remote/latest)
@@ -82,6 +101,7 @@ Sistema que monitora mudanças em tempo real nos dois sentidos:
 ### 🎯 **Operações Específicas**
 
 **Por Nome (busca inteligente):**
+
 ```bash
 ./devhub download "Demo RAG"           # Busca fuzzy
 ./devhub find "email"                  # Encontra workflows
@@ -89,6 +109,7 @@ Sistema que monitora mudanças em tempo real nos dois sentidos:
 ```
 
 **Por ID Específico:**
+
 ```bash
 ./devhub download-id 8loOlT9y6XM4gB0D  # Download direto
 ./devhub sync-start --by-id 8loOlT9y6XM4gB0D
@@ -112,6 +133,7 @@ N8N_URL=https://n8n.empresa.com
 ## 📖 Comandos Completos
 
 ### **📋 Listagem e Status**
+
 ```bash
 ./devhub list                    # Workflows remotos
 ./devhub list-local             # Workflows locais
@@ -120,6 +142,7 @@ N8N_URL=https://n8n.empresa.com
 ```
 
 ### **📥 Download**
+
 ```bash
 ./devhub download-all           # Todos os workflows
 ./devhub download-active        # Apenas ativos
@@ -128,6 +151,7 @@ N8N_URL=https://n8n.empresa.com
 ```
 
 ### **📤 Upload**
+
 ```bash
 ./devhub upload-all             # Todos os workflows locais
 ./devhub upload workflow.json   # Arquivo específico
@@ -135,6 +159,7 @@ N8N_URL=https://n8n.empresa.com
 ```
 
 ### **🔄 Sincronização Assíncrona**
+
 ```bash
 # Iniciar sync em tempo real
 ./devhub sync-start "Demo RAG"
@@ -152,6 +177,7 @@ N8N_URL=https://n8n.empresa.com
 ```
 
 ### **⚙️ Gerenciamento**
+
 ```bash
 ./devhub activate "workflow"    # Ativar
 ./devhub deactivate "workflow"  # Desativar
@@ -160,6 +186,7 @@ N8N_URL=https://n8n.empresa.com
 ```
 
 ### **🐳 Controle Docker**
+
 ```bash
 ./devhub docker start          # Iniciar ambiente
 ./devhub docker stop           # Parar ambiente
@@ -168,34 +195,62 @@ N8N_URL=https://n8n.empresa.com
 ./devhub docker clean          # Reset completo
 ```
 
+### **🗑️ Limpeza Docker**
+
+```bash
+./devhub clear list-containers     # Lista containers com ID e nome
+./devhub clear remove-container <id>  # Remove container específico
+./devhub clear n8n                 # Remove apenas N8N (seguro)
+./devhub clear cache               # Limpa apenas cache
+./devhub clear containers          # Remove todos containers
+./devhub clear images              # Remove todas imagens  
+./devhub clear volumes             # Remove volumes (⚠️ perde dados)
+./devhub clear all                 # Limpeza completa (⚠️ remove tudo)
+```
+
 ## 🏗️ Arquitetura
 
-### **Estrutura Organizada**
+### **Estrutura do Projeto**
+
 ```
-N8N-DevHub/
-├── python/
-│   └── devhub.py                # Aplicação principal Python
-├── scripts/
-│   ├── init-dev                # Inicializador de ambiente
-│   └── dev-control             # Controle Docker
-├── models/workflow_model.py     # Dados e API N8N
-├── controllers/workflow_controller.py  # Lógica de negócios
-├── views/cli_view.py           # Interface CLI colorida
-├── utils/sync_manager.py       # Sistema assíncrono
-└── docker-compose.yml          # Ambiente de desenvolvimento
+N8N-DevHub/                     # Diretório raiz do projeto
+├── devhub                      # Script principal (bash)
+├── venv/                       # Ambiente virtual Python
+├── workflows/                  # Workflows N8N (JSON)
+├── README.md                   # Esta documentação
+└── N8N-DevHub/                 # Core do sistema
+    ├── requirements.txt        # Dependências Python
+    ├── docker-compose.yml      # Ambiente N8N
+    ├── python/
+    │   └── devhub.py          # Aplicação principal Python
+    ├── scripts/
+    │   ├── init-dev           # Inicializador Docker
+    │   ├── dev-control        # Controle Docker
+    │   └── clear-docker       # Limpeza Docker
+    ├── models/
+    │   └── workflow_model.py  # API e dados N8N
+    ├── controllers/
+    │   └── workflow_controller.py  # Lógica de negócios
+    ├── views/
+    │   └── cli_view.py        # Interface CLI
+    └── utils/
+        └── sync_manager.py    # Sincronização assíncrona
 ```
 
-### **Scripts Principais**
+### **Como o Sistema Funciona**
+
 ```
-devhub             # Script principal (comandos unificados)
-├── devhub init    # Inicializar ambiente
-├── devhub docker  # Controle Docker
-└── devhub ...     # Todos os comandos normais
+./devhub [comando]                   # Script bash principal
+├── init     → scripts/init-dev      # Configurar Docker
+├── docker   → scripts/dev-control   # Controlar Docker  
+├── clear    → scripts/clear-docker  # Limpar Docker
+└── outros   → python/devhub.py      # Comandos Python
 ```
 
 ## ⚙️ Configuração
 
 ### **Arquivo .env**
+
 ```bash
 # ========================================
 # N8N SERVER - Mude aqui para trocar ambiente
@@ -216,32 +271,43 @@ N8N_BASIC_AUTH_USER=admin
 N8N_BASIC_AUTH_PASSWORD=admin123
 ```
 
-### **Instalação Manual** (opcional)
-Se preferir instalar manualmente em vez de usar `./devhub init`:
+### **Resolução de Problemas Comuns**
+
+**Erro: "ModuleNotFoundError: No module named 'watchdog'"**
+
+Este erro acontece quando as dependências Python não foram instaladas. Para resolver:
 
 ```bash
-# 1. Criar ambiente virtual
-python3 -m venv venv
+# 1. Ativar o ambiente virtual (se não estiver ativo)
 source venv/bin/activate
 
-# 2. Instalar dependências
-pip install -r requirements.txt
+# 2. Instalar/reinstalar dependências
+pip install -r N8N-DevHub/requirements.txt
 
-# 3. Criar pasta workflows
-mkdir -p workflows
+# 3. Verificar se foi instalado corretamente
+pip list | grep watchdog
 
-# 4. Subir N8N
-./devhub docker start
-
-# Dependências principais:
-# - requests (API calls)
-# - python-dotenv (configuração)  
-# - watchdog (file watcher)
+# 4. Agora o comando deve funcionar
+./devhub help
 ```
+
+**Comando Completo para Primeira Instalação:**
+
+```bash
+# Instalar tudo de uma vez
+python3 -m venv venv && source venv/bin/activate && pip install -r N8N-DevHub/requirements.txt && ./devhub init
+```
+
+**Dependências Principais:**
+
+- `requests>=2.31.0` - Comunicação com API N8N
+- `python-dotenv>=1.0.0` - Gerenciamento de configurações
+- `watchdog>=3.0.0` - Monitoramento de arquivos em tempo real
 
 ## 🔄 Casos de Uso
 
 ### **1. Desenvolvimento Local → Produção**
+
 ```bash
 # Desenvolvimento
 ./devhub sync-start "API Workflow"
@@ -252,6 +318,7 @@ mkdir -p workflows
 ```
 
 ### **2. Sincronização em Tempo Real**
+
 ```bash
 # Equipe colaborativa
 ./devhub sync-start "Shared Workflow"
@@ -262,6 +329,7 @@ mkdir -p workflows
 ```
 
 ### **3. Scripts/IA Externa**
+
 ```python
 # Script Python modifica workflow
 import json
@@ -276,6 +344,7 @@ with open('workflows/Demo_RAG_in_n8n_8loOlT9y6XM4gB0D.json', 'r+') as f:
 ```
 
 ### **4. Backup e Versionamento**
+
 ```bash
 # Backup contínuo
 ./devhub sync-start "Critical,Production,Main"
@@ -291,6 +360,7 @@ git push
 Quando o mesmo workflow é modificado localmente E remotamente:
 
 ### **Modo Interativo** (padrão)
+
 ```
 🚨 CONFLITO DETECTADO: Demo RAG
    Local atualizado: 2025-08-14 15:45:32
@@ -306,6 +376,7 @@ Escolha uma opção (1-4):
 ```
 
 ### **Modo Automático**
+
 ```bash
 # Estratégias automáticas
 --conflict-resolution local    # Sempre usar local
@@ -316,11 +387,13 @@ Escolha uma opção (1-4):
 ## 📊 Monitoramento
 
 ### **Status da Sincronização**
+
 ```bash
 ./devhub sync-status
 ```
 
 **Saída:**
+
 ```
 🔄 Status: Rodando
 📊 Workflows Monitorados: 3
@@ -339,11 +412,13 @@ Detalhes dos Workflows:
 ```
 
 ### **Comparação Local vs Remoto**
+
 ```bash
 ./devhub status
 ```
 
 Mostra workflows:
+
 - ☁️ **Apenas Remotos**: No N8N mas não localmente
 - 📁 **Apenas Locais**: Arquivos não sincronizados
 - 🔄 **Em Ambos**: Sincronizados ou com diferenças
@@ -351,77 +426,17 @@ Mostra workflows:
 ## 🎨 Interface Visual
 
 A CLI usa cores para melhor experiência:
+
 - 🟢 **Verde**: Sucesso, workflows ativos
 - 🟡 **Amarelo**: Avisos, workflows inativos
 - 🔴 **Vermelho**: Erros
 - 🔵 **Azul**: Informações
 - 🟦 **Ciano**: URLs, IDs
 
-## 🌍 Instalação Global
-
-### **Automática (Recomendada)**
-```bash
-# Instalar globalmente com um comando
-./devhub install-global
-```
-
-O script automático:
-- ✅ Cria `~/.local/bin/devhub` com caminhos absolutos
-- ✅ Adiciona `~/.local/bin` ao PATH em `~/.bashrc`
-- ✅ Configura PATH para sessão atual
-- ✅ Testa instalação e conectividade
-- ✅ Funciona de qualquer diretório do sistema
-
-### **Manual** (se necessário)
-```bash
-# 1. Copiar script
-cp devhub ~/.local/bin/devhub
-chmod +x ~/.local/bin/devhub
-
-# 2. Editar caminhos no script
-nano ~/.local/bin/devhub
-# Alterar PROJECT_DIR para caminho absoluto
-
-# 3. Adicionar ao PATH
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-### **Verificação**
-```bash
-# Testar se funciona
-which devhub                    # Deve mostrar ~/.local/bin/devhub
-devhub help                     # Interface deve aparecer
-devhub list                     # Deve listar workflows
-
-# Se não funcionar em novo terminal:
-source ~/.bashrc
-```
-
-### **Uso Global**
-Após instalação, use de qualquer diretório:
-```bash
-cd ~
-devhub list                     # Funciona!
-
-cd /tmp  
-devhub sync-start "Demo"        # Funciona!
-
-cd /var/www
-devhub download "API"           # Funciona!
-```
-
-### **Reinstalação**
-Se mover o projeto ou ter problemas:
-```bash
-# Reinstalar automaticamente
-devhub install-global           # ou
-./path/to/projeto/devhub install-global
-```
-
 ## 🔧 Configurações Avançadas
 
 ### **Sincronização**
+
 ```bash
 # Intervalo de verificação (padrão: 10s)
 --poll-interval 5
@@ -437,6 +452,7 @@ devhub install-global           # ou
 ```
 
 ### **Filtros e Busca**
+
 ```bash
 # Workflows ativos apenas
 ./devhub list --active
@@ -449,22 +465,31 @@ devhub install-global           # ou
 
 ## 🐳 Ambiente Docker
 
-### **Inicialização Completa**
+### **Inicialização Docker**
+
 ```bash
-./init-dev  # Sobe N8N + configura + testa conectividade
+./devhub init  # Sobe N8N + cria workflows/ + testa conectividade
 ```
 
 ### **Controles**
+
 ```bash
-./dev-control start     # Inicia ambiente
-./dev-control stop      # Para ambiente
-./dev-control restart   # Reinicia
-./dev-control logs      # Logs em tempo real
-./dev-control status    # Status containers
-./dev-control clean     # Reset completo (cuidado!)
+./devhub docker start     # Inicia ambiente
+./devhub docker stop      # Para ambiente
+./devhub docker restart   # Reinicia
+./devhub docker logs      # Logs em tempo real
+./devhub docker status    # Status containers
+./devhub docker clean     # Reset completo (cuidado!)
+
+# Limpeza seletiva
+./devhub clear list-containers     # Ver containers rodando
+./devhub clear remove-container <id>  # Remove container específico  
+./devhub clear n8n                 # Remove apenas N8N (recomendado)
+./devhub clear all                 # Remove tudo (cuidado!)
 ```
 
 ### **Configuração Docker**
+
 - **Volume nomeado**: Dados isolados (não cria pasta n8n_data)
 - **Workflows compartilhados**: Pasta `workflows/` linkada
 - **Ambiente limpo**: Reset fácil com `clean`
@@ -472,6 +497,7 @@ devhub install-global           # ou
 ## ⚡ Performance e Otimizações
 
 ### **Recomendações de Intervalo**
+
 ```bash
 # Desenvolvimento (resposta rápida)
 --poll-interval 5
@@ -484,6 +510,7 @@ devhub install-global           # ou
 ```
 
 ### **Otimizações Internas**
+
 - **Hash Comparison**: Apenas mudanças reais são sincronizadas
 - **File Watcher**: Detecção instantânea sem polling
 - **Thread Pool**: Processamento paralelo
@@ -492,25 +519,28 @@ devhub install-global           # ou
 ## 🚧 Limitações
 
 - ❌ **Credenciais**: Não sincroniza credenciais (segurança)
-- ❌ **Execuções**: Não transfere histórico de execuções  
+- ❌ **Execuções**: Não transfere histórico de execuções
 - ❌ **Binary Data**: Não sincroniza dados binários grandes
 - ❌ **Webhooks**: URLs podem precisar reconfiguração
 
 ## 🎯 Benefícios
 
 ### **Para Desenvolvedores**
+
 - 💻 Edite workflows com ferramentas locais favoritas
 - 🔄 Sincronização automática sem comandos manuais
 - 🤝 Colaboração em equipe com sync em tempo real
 - 📝 Versionamento Git-friendly
 
 ### **Para DevOps**
+
 - 🏗️ CI/CD via arquivos JSON
-- 📊 Monitoramento em tempo real  
+- 📊 Monitoramento em tempo real
 - 🔄 Backup contínuo automático
 - 🌍 Deploy multi-ambiente simplificado
 
 ### **Para Automação**
+
 - 🤖 Scripts externos podem modificar workflows
 - ⚡ Mudanças aplicadas instantaneamente no N8N
 - 🎯 Operações específicas por ID/nome
@@ -519,9 +549,11 @@ devhub install-global           # ou
 ## 📚 Exemplos Avançados
 
 ### **Workflow de Desenvolvimento**
+
 ```bash
-# 1. Iniciar projeto
-./init-dev
+# 1. Configurar ambiente
+python3 -m venv venv && source venv/bin/activate && pip install -r N8N-DevHub/requirements.txt
+./devhub init
 ./devhub download-all
 
 # 2. Desenvolver com sync
@@ -534,6 +566,7 @@ devhub install-global           # ou
 ```
 
 ### **Automação com Scripts**
+
 ```bash
 # Script que roda periodicamente
 #!/bin/bash
@@ -549,6 +582,7 @@ git commit -m "Auto backup $(date)"
 ```
 
 ### **Multi-Ambiente Avançado**
+
 ```bash
 # .env.dev
 N8N_URL=http://localhost:5678
@@ -566,18 +600,20 @@ cp .env.prod .env && ./devhub upload-all
 ## ❓ Troubleshooting
 
 ### **Erro de Conexão**
+
 ```bash
 # Verificar se N8N está rodando
 curl http://localhost:5678
 
 # Ver logs do Docker
-./dev-control logs
+./devhub docker logs
 
 # Testar conectividade
 ./devhub list
 ```
 
 ### **Problemas de Autenticação**
+
 ```bash
 # Verificar .env
 cat .env | grep -E "(API_N8N|N8N_BASIC_AUTH)"
@@ -588,26 +624,48 @@ cat .env | grep -E "(API_N8N|N8N_BASIC_AUTH)"
 ```
 
 ### **Sincronização não Funciona**
+
 ```bash
 # Ver status detalhado
 ./devhub sync-status
 
 # Verificar logs
-./dev-control logs
+./devhub docker logs
 
 # Reiniciar ambiente
-./dev-control restart
+./devhub docker restart
+```
+
+### **Limpeza de Ambiente**
+
+```bash
+# Ver containers rodando primeiro
+./devhub clear list-containers
+
+# Remover container específico (seguro)
+./devhub clear remove-container abc123
+
+# Reset N8N mantendo outros projetos
+./devhub clear n8n
+
+# Reset completo (remove tudo!)
+./devhub clear all
+
+# Apenas limpar cache (mais seguro)
+./devhub clear cache
 ```
 
 ## 🤝 Contribuindo
 
 ### **Estrutura para Extensões**
+
 - **Models**: Adicionar novos tipos de dados
 - **Controllers**: Nova lógica de negócios
 - **Views**: Interfaces alternativas (web?)
 - **Utils**: Utilitários compartilhados
 
 ### **Próximas Funcionalidades**
+
 - 🌐 Interface Web opcional
 - 🔄 Sync incremental/diferencial
 - 📊 Métricas e relatórios
@@ -624,4 +682,4 @@ Este projeto é open source e está disponível sob licença MIT.
 
 **Transforme seu desenvolvimento N8N em uma experiência profissional, colaborativa e eficiente.**
 
-🚀 **Comece agora**: `./init-dev && ./devhub sync-start "Meu Workflow"`
+🚀 **Comece agora**: `python3 -m venv venv && source venv/bin/activate && pip install -r N8N-DevHub/requirements.txt && ./devhub init`

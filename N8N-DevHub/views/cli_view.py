@@ -208,6 +208,7 @@ class CLIView:
         setup_commands = [
             (self._colorize('init', Colors.GREEN), "Inicializar ambiente completo"),
             (f"{self._colorize('docker', Colors.GREEN)} <cmd>", "Controle Docker (start/stop/logs)"),
+            (f"{self._colorize('clear', Colors.GREEN)} <cmd>", "Limpeza Docker (n8n/cache/all)"),
         ]
         self._print_section("🛠️  SETUP E AMBIENTE", setup_commands)
         
@@ -271,13 +272,25 @@ class CLIView:
         ]
         self._print_section("🎛️  FILTROS", filter_commands)
         
+        # Seção Limpeza Docker
+        clear_commands = [
+            (self._colorize('clear list-containers', Colors.GREEN), "Lista containers com ID e nome"),
+            (f"{self._colorize('clear remove-container', Colors.GREEN)} <id>", "Remove container específico"),
+            (self._colorize('clear n8n', Colors.GREEN), "Remove apenas N8N (seguro)"),
+            (self._colorize('clear cache', Colors.GREEN), "Limpa cache Docker"),
+            (self._colorize('clear all', Colors.GREEN), "Limpeza completa (⚠️ remove tudo)")
+        ]
+        self._print_section("🗑️  LIMPEZA DOCKER", clear_commands)
+        
         # Seção Exemplos
         example_commands = [
             (self._colorize('devhub init', Colors.CYAN), "Setup completo"),
             (self._colorize('devhub list --active', Colors.CYAN), "Lista ativos"),
             (self._colorize('devhub download "Demo"', Colors.CYAN), "Baixa por nome"),
             (self._colorize('devhub upload demo.json', Colors.CYAN), "Envia arquivo"),
-            (self._colorize('devhub sync-start "Demo"', Colors.CYAN), "Inicia sync")
+            (self._colorize('devhub sync-start "Demo"', Colors.CYAN), "Inicia sync"),
+            (self._colorize('devhub clear list-containers', Colors.CYAN), "Ver containers rodando"),
+            (self._colorize('devhub clear n8n', Colors.CYAN), "Reset N8N seguro")
         ]
         self._print_section("💡 EXEMPLOS", example_commands)
         

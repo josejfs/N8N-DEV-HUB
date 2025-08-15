@@ -21,25 +21,21 @@ if ! docker info > /dev/null 2>&1; then
     exit 1
 fi
 
-# Criar ambiente virtual Python se não existir
+# Verificar se ambiente virtual existe
 if [ ! -d "venv" ]; then
-    echo "🐍 Criando ambiente virtual Python..."
-    python3 -m venv venv
-    echo "✅ Ambiente virtual criado"
-else
-    echo "✅ Ambiente virtual já existe"
+    echo "❌ Ambiente virtual não encontrado!"
+    echo "   Execute primeiro: python3 -m venv venv && source venv/bin/activate && pip install -r N8N-DevHub/requirements.txt"
+    exit 1
 fi
 
-# Ativar ambiente virtual
-echo "📦 Ativando ambiente virtual..."
-source venv/bin/activate
+# Verificar se dependências estão instaladas
+if ! python3 -c "import watchdog" 2>/dev/null; then
+    echo "❌ Dependências não instaladas!"
+    echo "   Execute: source venv/bin/activate && pip install -r N8N-DevHub/requirements.txt"
+    exit 1
+fi
 
-# Instalar/atualizar dependências
-echo "📚 Instalando dependências Python..."
-pip install --upgrade pip > /dev/null 2>&1
-pip install -r N8N-DevHub/requirements.txt
-
-echo "✅ Dependências Python instaladas"
+echo "✅ Ambiente virtual e dependências OK"
 echo
 
 # Criar pasta workflows se não existir
@@ -106,16 +102,16 @@ echo
 # Voltar para diretório raiz
 cd ..
 
-# Testar conexão com DevHub (com venv ativo)
+# Testar conexão com DevHub
 echo "🔍 Testando conexão DevHub..."
-if python3 N8N-DevHub/python/devhub.py list > /dev/null 2>&1; then
+if source venv/bin/activate && python3 N8N-DevHub/python/devhub.py list > /dev/null 2>&1; then
     echo "✅ DevHub conectado com sucesso!"
 else
     echo "⚠️  DevHub com problema de conexão (normal na primeira vez)"
 fi
 
 echo
-echo "🎉 Ambiente de desenvolvimento inicializado!"
+echo "🎉 Ambiente Docker inicializado!"
 echo ""
 echo "📋 Para usar o DevHub:"
 echo "   source venv/bin/activate  # Ativar ambiente virtual"
