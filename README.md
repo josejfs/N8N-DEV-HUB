@@ -8,7 +8,7 @@
 
 ---
 
-**Desenvolvido por: [José Ferreira](https://github.com/jose-ferreira)** 👨‍💻
+**Desenvolvido por: [José Ferreira](https://github.com/josejfs)** 👨‍💻
 *Especialista em Automação e Sistemas N8N*
 
 ---
